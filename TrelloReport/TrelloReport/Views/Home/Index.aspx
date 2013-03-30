@@ -4,22 +4,18 @@
     Home Page
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var authUrl = "<%= Url.Action("IsAuthenticated","Api") %>";
+            IsAuthenticated(authUrl);
+        });
+    </script>
     <h2>
         <%= Model.Message %></h2>
-    <% if (string.IsNullOrEmpty(Model.TrelloUserKey))
-       { %>
-    <a href="<%= Model.TrelloAuthUrl %>" target="_blank">Authorize me</a>
-    <% }
-       else
-       { %>
-    <select>
-        <% foreach (var board in Model.Boards)
-           { %>
-        <option value="<%= board.Id %>">
-            <%= board.Name %></option>
-        <%   } %>
+    <a href="" id="trello-authorize" target="_blank">Authorize me</a>
+    <select id="trello-boadrs">
+        <option value="" selected="selected">Choose one</option>
     </select>
-    <% } %>
     <p>
         To learn more about ASP.NET MVC visit <a href="http://asp.net/mvc" title="ASP.NET MVC Website">
             http://asp.net/mvc</a>.
