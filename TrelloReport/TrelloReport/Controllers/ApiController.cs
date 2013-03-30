@@ -5,33 +5,33 @@ using System.Collections.Generic;
 
 namespace TrelloReport.Controllers
 {
+    // TODO: Ezeket majd az authorize filterre kötni, amit a majd trello belépéshez illesztünk
     public class ApiController : BaseController
     {
+        private JsonResult CreateResponse(object data)
+        {
+             var result = new JsonResult
+                       {
+                           ContentEncoding = Encoding.UTF8,
+                           ContentType = "application/json",
+                           Data = data,
+                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                       };
+            return result;
+        }
+
         public ActionResult IsAuthenticated()
         {
             var userKey = GetUserKey();
 
-            // create base object for the return
-            var result = new JsonResult
-                       {
-                           ContentEncoding = Encoding.UTF8,
-                           ContentType = "application/json",
-                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                       };
-
             // validate
             if (string.IsNullOrEmpty(userKey))
             {
-                // generate aut url
+                // generate auth url
                 var link = new Trello(TrelloApiKey).GetAuthorizationUrl(TrelloAppName, Scope.ReadOnly, Expiration.Never).ToString();
-                result.Data = new {isLogged = false, authUrl = link};
+                return CreateResponse(new {isLogged = false, authUrl = link});
             }
-            else
-            {
-                result.Data = new { isLogged = true, authUrl = string.Empty };
-            }
-
-            return result;
+            return CreateResponse(new { isLogged = true, authUrl = string.Empty });
         }
 
         public ActionResult GetBoards()
@@ -45,14 +45,22 @@ namespace TrelloReport.Controllers
             {
                 retBoards.Add(new {board.Id,board.Name, board.Closed, board.IdOrganization });
             }
+            return CreateResponse(retBoards);
+        }
 
-            return new JsonResult
-                       {
-                           ContentEncoding = Encoding.UTF8,
-                           ContentType = "application/json",
-                           Data = retBoards,
-                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                       };
+
+        public ActionResult GetLists(string boardId)
+        {
+            var trello = new Trello(TrelloApiKey);
+            var userKey = GetUserKey();
+            trello.Authorize(userKey);
+            var lists = trello.Lists.ForBoard(new BoardId(boardId));
+            var retBLists = new List<object>();
+            foreach (var list in lists)
+            {
+                retBLists.Add(new { list.Id, list.Name, list.Closed, list.Pos });
+            }
+            return CreateResponse(retBLists);
         }
     }
 }
