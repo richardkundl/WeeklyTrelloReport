@@ -13,6 +13,7 @@ function logError(error) {
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
 var urlFillLists = "/api/getlists";
+var urlFillUsers = "/api/getusersonboard";
 
 
 function IsAuthenticatedSucces(result) {
@@ -44,7 +45,23 @@ function FillListsSucces(result) {
     container.html('');
     $.each(result, function () {
         var label = $('<label />', { class: 'checkbox', text: this.Name }).appendTo(container);
-        $('<input />', { type: 'checkbox', id: 'boardListsCb', value: this.Id, checked: 'checked' }).appendTo(label);
+        $('<input />', { type: 'checkbox', name: 'boardListsCb', value: this.Id, checked: 'checked' }).appendTo(label);
+    });
+    $('button#generate-report').removeAttr('disabled');
+}
+
+function FillUsersClean() {
+    var container = $('div#board-users');
+    container.html('');
+    $('button#generate-report').attr('disabled', 'disabled');
+}
+
+function FillUsersSucces(result) {
+    var container = $('div#board-users');
+    container.html('');
+    $.each(result, function () {
+        var label = $('<label />', { class: 'checkbox', text: this.FullName }).appendTo(container);
+        $('<input />', { type: 'checkbox', name: 'boardUsersCb', value: this.Id, checked: 'checked' }).appendTo(label);
     });
     $('button#generate-report').removeAttr('disabled');
 }
@@ -78,6 +95,29 @@ function FillBoards() {
 
     request.done(function (result) {
         FillBoardsSucces(result);
+    });
+
+    request.fail(function (jqXHR, textStatus) {
+        logError(textStatus);
+    });
+}
+
+function FillUsers(boardId) {
+    FillUsersClean();
+    if (boardId == '') {
+        return;
+    }
+
+    var data = { boardId: boardId };
+    var request = $.ajax({
+        url: urlFillUsers,
+        type: "POST",
+        data: data,
+        dataType: "json"
+    });
+
+    request.done(function (result) {
+        FillUsersSucces(result);
     });
 
     request.fail(function (jqXHR, textStatus) {

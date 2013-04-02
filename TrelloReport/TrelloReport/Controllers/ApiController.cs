@@ -67,5 +67,19 @@ namespace TrelloReport.Controllers
             }
             return CreateResponse(retBLists);
         }
+
+        public ActionResult GetUsersOnBoard(string boardId)
+        {
+            if (string.IsNullOrEmpty(boardId))
+            {
+                return CreateResponse(null);
+            }
+
+            var trello = new Trello(TrelloApiKey);
+            var userKey = GetUserKey();
+            trello.Authorize(userKey);
+            var users = trello.Members.ForBoard(new BoardId(boardId));
+            return CreateResponse(users);
+        }
     }
 }
