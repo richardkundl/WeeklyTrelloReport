@@ -28,13 +28,25 @@ function IsAuthenticatedSucces(result) {
 
 function FillBoardsSucces(result) {
     $.each(result, function () {
-        var options = $("select#trello-boards");
-        options.append($("<option />").val(this.Id).text(this.Name));
+        var container = $("select#trello-boards");
+        container.append($("<option />").val(this.Id).text(this.Name));
     });
 };
 
+function FillListsClean() {
+    var container = $('div#board-lists');
+    container.html('');
+    $('button#generate-report').attr('disabled', 'disabled');
+}
+
 function FillListsSucces(result) {
-    alert(result);
+    var container = $('div#board-lists');
+    container.html('');
+    $.each(result, function () {
+        var label = $('<label />', { class: 'checkbox', text: this.Name }).appendTo(container);
+        $('<input />', { type: 'checkbox', id: 'boardListsCb', value: this.Id, checked: 'checked' }).appendTo(label);
+    });
+    $('button#generate-report').removeAttr('disabled');
 }
 
 function IsAuthenticated() {
@@ -74,6 +86,11 @@ function FillBoards() {
 }
 
 function FillLists(boardId) {
+    FillListsClean();
+    if (boardId == '') {
+        return;
+    }
+
     var data = { boardId: boardId };
     var request = $.ajax({
         url: urlFillLists,

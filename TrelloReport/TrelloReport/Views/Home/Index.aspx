@@ -6,22 +6,31 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <h1>
         <%= Model.Message %></h1>
-    <p>
+    <div class="row">
         <a href="" id="trello-authorize" target="_blank">Authorize me</a>
-        <select id="trello-boards" class="span3">
-            <option value="" selected="selected">Choose one</option>
-        </select>
-    </p>
-    <p>
-    </p>
+    </div>
+    <div class="row">
+        <div class="span3">
+            <select id="trello-boards" class="span3">
+                <option value="" selected="selected">Choose one</option>
+            </select>
+            <div id="board-lists">
+            </div>
+            <button type="button" id="generate-report" class="btn btn-large btn-primary" disabled="disabled">
+                Riport készítés
+            </button>
+        </div>
+        <div class="span9">
+        </div>
+    </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             IsAuthenticated();
         });
-        
-        $("#trello-boards").change(function(){
+
+        $("#trello-boards").change(function () {
             FillLists($(this).find(":selected").val());
         });
     </script>

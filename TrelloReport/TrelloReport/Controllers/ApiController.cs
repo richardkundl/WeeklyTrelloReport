@@ -51,6 +51,11 @@ namespace TrelloReport.Controllers
 
         public ActionResult GetLists(string boardId)
         {
+            if(string.IsNullOrEmpty(boardId))
+            {
+                return CreateResponse(null);
+            }
+
             var trello = new Trello(TrelloApiKey);
             var userKey = GetUserKey();
             trello.Authorize(userKey);
