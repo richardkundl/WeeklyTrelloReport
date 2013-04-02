@@ -14,14 +14,28 @@
             <select id="trello-boards" class="span3">
                 <option value="" selected="selected">Choose one</option>
             </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span3">
+            <h6>Lista:</h6>
+            <label class="checkbox"><input type="checkbox" checked="checked" id="board-lists-selectall"/>Összes</label>
             <div id="board-lists">
             </div>
-            <button type="button" id="generate-report" class="btn btn-large btn-primary" disabled="disabled">
-                Riport készítés
-            </button>
         </div>
-        <div class="span9">
+        <div class="span3">
+            <h6>Felhasználó:</h6>
+            <label class="checkbox"><input type="checkbox" checked="checked" id="board-users-selectall"/>Összes</label>
+            <div id="board-users">
+            </div>
         </div>
+        <div class="span6">
+        </div>
+    </div>
+    <div class="row">
+        <button type="button" id="generate-report" class="btn btn-large btn-primary" disabled="disabled">
+            Riport készítés
+        </button>
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">
@@ -31,7 +45,24 @@
         });
 
         $("#trello-boards").change(function () {
-            FillLists($(this).find(":selected").val());
+            var board = $(this).find(":selected").val();
+            FillLists(board);
+            FillUsers(board);
         });
+
+        $("#board-lists-selectall").click(function () {
+            var checkedStatus = this.checked;
+            $('div#board-lists').find('label :checkbox').each(function () {
+                $(this).prop('checked', checkedStatus);
+            });
+        });
+
+        $("#board-users-selectall").click(function () {
+            var checkedStatus = this.checked;
+            $('div#board-users').find('label :checkbox').each(function () {
+                $(this).prop('checked', checkedStatus);
+            });
+        });
+
     </script>
 </asp:Content>
