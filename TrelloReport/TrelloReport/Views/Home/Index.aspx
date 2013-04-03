@@ -36,20 +36,19 @@
         <div class="span3">
             <h6>
                 Típus:</h6>
-            <label class="radio">
-                <input type="radio" name="report-type" value="weekly" checked>
-                Heti
-            </label>
-            <label class="radio">
-                <input type="radio" name="report-type" value="daily">
-                Napi
-            </label>
+            <div id="tab" class="btn-group" data-toggle="buttons-radio">
+                <a href="#weekly" id="report-type-weekly" class="btn active" data-toggle="tab">Heti</a>
+                <a href="#daily" id="report-type-daily" class="btn" data-toggle="tab">Napi</a>
+                <input type="hidden" id="report-type" name="report-type" value="weekly" />
+            </div>
+            <p></p>
+            <div class="input-append">
+                <input type="text" id="report-week" value="" maxlength="2" class="input-mini" />
+                <span class="add-on">. hét</span>
+            </div>
             <p>
-                <label>
-                    <input type="text" id="report-week" value="1" maxlength="2" class="input-mini" />&nbsp;hét</label></p>
-            <p>
-                <input type="date" name="report-week-preview" id="report-week-preview" class="input-medium" data-date-format="yy.mm.dd"
-                    readonly="readonly" /></p>
+                <input type="date" name="report-week-preview" id="report-week-preview" class="input-medium"
+                    data-date-format="yy.mm.dd" readonly="readonly" /></p>
         </div>
         <div class="span3">
             <p>
@@ -67,15 +66,29 @@
         $(document).ready(function () {
             IsAuthenticated();
 
-            var actualWeek = (new Date()).getWeek();
-            $("input#report-week").val(actualWeek);
-            $("input#report-week-preview").val(startDateOfWeek(actualWeek+10));
+            weekNumberSetDefault();
         });
 
         $("#trello-boards").change(function () {
             var board = $(this).find(":selected").val();
             FillLists(board);
             FillUsers(board);
+        });
+
+        $("#report-week").keyup(function () {
+            recalculateWeekStartDay();
+        });
+
+        $("#report-week").blur(function () {
+            recalculateWeekStartDay();
+        });
+
+        $("a#report-type-weekly").click(function () {
+            reportTypeWeeklySelect();
+        });
+
+        $("a#report-type-daily").click(function () {
+            reportTypeDailySelect();
         });
 
         $("#board-lists-selectall").click(function () {
