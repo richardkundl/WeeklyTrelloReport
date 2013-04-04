@@ -257,15 +257,17 @@ function FillLists(boardId) {
 
 function ReportPreview() {
     var boardId = getSelectedBoard();
-    var listIds = getCheckdItems("div#board-lists input:checked");
-    var userIds = getCheckdItems("div#board-users input:checked"); 
     var reportIntervalType = getReportTypeInterval();
     var startDate = getReportStartDate();
+    var listIds = getCheckdItems("div#board-lists input:checked");
+    var userIds = getCheckdItems("div#board-users input:checked");
 
-    var data = { boardId: boardId, listIds: JSON.stringify(listIds), userIds: JSON.stringify(userIds), 
-                reportIntervalType: reportIntervalType, startDate: startDate };
+    var data = { boardId: boardId, listIds: listIds, userIds: userIds, reportIntervalType: reportIntervalType, startDate: startDate };
+
     var request = $.ajax({
         url: urlReportPreview,
+        //  traditional: true | it wac required if sending List<POCO> data
+        traditional: true,
         type: "POST",
         data: data,
         dataType: "json"
