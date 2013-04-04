@@ -45,6 +45,40 @@ function logError(error) {
     }
 }
 
+function weekNumberSetDefault() {
+    var week = $("#report-week").val();
+    
+    if (week == '') {
+        week = (new Date()).getWeek();
+        $("#report-week").val(week);
+    }
+    
+    $("#report-week").blur();
+}
+
+function recalculateWeekStartDay() {
+    var week = $("#report-week").val();
+
+    if (week == NaN) {
+        alert("A riportolni kivánt hét nem szám!");
+    }
+
+    $("input#report-week-preview").val(startDateOfWeek(week));
+}
+
+function reportTypeWeeklySelect() {
+    $("input#report-type").val("weekly");
+    $("input#report-week").parent().show();
+    $("input#report-week-preview").attr('readonly', 'readonly');
+    recalculateWeekStartDay();
+}
+
+function reportTypeDailySelect() {
+    $("input#report-type").val("daily");
+    $("input#report-week").parent().hide();
+    $("input#report-week-preview").removeAttr("readonly");
+}
+
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
 var urlFillLists = "/api/getlists";
