@@ -2,6 +2,7 @@
 using System.Text;
 using TrelloNet;
 using System.Collections.Generic;
+using TrelloReport.Models;
 
 namespace TrelloReport.Controllers
 {
@@ -80,6 +81,12 @@ namespace TrelloReport.Controllers
             trello.Authorize(userKey);
             var users = trello.Members.ForBoard(new BoardId(boardId));
             return CreateResponse(users);
+        }
+
+        [HttpPost]
+        public ActionResult ReportPreview(ReportModel model)
+        {
+            return CreateResponse(null);
         }
     }
 }

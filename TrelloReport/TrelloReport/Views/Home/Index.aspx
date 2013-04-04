@@ -86,9 +86,13 @@
         });
 
         $("#trello-boards").change(function () {
-            var board = $(this).find(":selected").val();
+            var board = getSelectedBoard();
             FillLists(board);
             FillUsers(board);
+        });
+
+        $("button#generate-preview-report").click(function () {
+            ReportPreview();
         });
 
         $("#report-week").keyup(function () {

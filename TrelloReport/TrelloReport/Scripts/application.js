@@ -5,11 +5,11 @@ Date.prototype.getWeek = function () {
 };
 
 function toTwoDigitNumber(number) {
-    if(number.toString().length > 1) {
+    if (number.toString().length > 1) {
         return number;
     }
-    
-    return '0' + number; 
+
+    return '0' + number;
 }
 
 function startDateOfWeek(weekNo) {
@@ -47,12 +47,12 @@ function logError(error) {
 
 function weekNumberSetDefault() {
     var week = $("#report-week").val();
-    
+
     if (week == '') {
         week = (new Date()).getWeek();
         $("#report-week").val(week);
     }
-    
+
     $("#report-week").blur();
 }
 
@@ -93,11 +93,34 @@ function reportButtonsDisabled() {
     $('button#generate-preview-report').attr('disabled', 'disabled');
 }
 
+function getSelectedBoard() {
+    var board = $("#trello-boards").find(":selected").val();
+    return board;
+}
+
+function getReportTypeInterval() {
+    var interval = $("input#report-type").val();
+    return interval;
+}
+
+function getReportStartDate() {
+    var startDate = $("input#report-week-preview").val();
+    return startDate;
+}
+
+function getCheckdItems(selector) {
+    var names = [];
+    $(selector).each(function () {
+        names.push(this.value);
+    });
+    return names;
+}
 
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
 var urlFillLists = "/api/getlists";
 var urlFillUsers = "/api/getusersonboard";
+var urlReportPreview = "/api/reportpreview";
 
 
 function IsAuthenticatedSucces(result) {
@@ -225,6 +248,31 @@ function FillLists(boardId) {
 
     request.done(function (result) {
         FillListsSucces(result);
+    });
+
+    request.fail(function (jqXHR, textStatus) {
+        logError(textStatus);
+    });
+}
+
+function ReportPreview() {
+    var boardId = getSelectedBoard();
+    var listIds = getCheckdItems("div#board-lists input:checked");
+    var userIds = getCheckdItems("div#board-users input:checked"); 
+    var reportIntervalType = getReportTypeInterval();
+    var startDate = getReportStartDate();
+
+    var data = { boardId: boardId, listIds: JSON.stringify(listIds), userIds: JSON.stringify(userIds), 
+                reportIntervalType: reportIntervalType, startDate: startDate };
+    var request = $.ajax({
+        url: urlReportPreview,
+        type: "POST",
+        data: data,
+        dataType: "json"
+    });
+
+    request.done(function (result) {
+        alert(result);
     });
 
     request.fail(function (jqXHR, textStatus) {
