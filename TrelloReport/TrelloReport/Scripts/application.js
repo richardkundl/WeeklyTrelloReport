@@ -274,7 +274,7 @@ function ReportPreview() {
     });
 
     request.done(function (result) {
-        alert(result);
+        $("#preview-data").html(result.toString());
     });
 
     request.fail(function (jqXHR, textStatus) {

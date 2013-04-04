@@ -75,6 +75,7 @@
         </div>
     </div>
     <div class="row">
+        <div id="preview-data"></div>
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">
