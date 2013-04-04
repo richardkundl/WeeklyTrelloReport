@@ -70,6 +70,7 @@ function reportTypeWeeklySelect() {
     $("input#report-type").val("weekly");
     $("input#report-week").parent().show();
     $("input#report-week-preview").attr('readonly', 'readonly');
+    $("input#report-week-preview").attr('disabled', 'disabled');
     recalculateWeekStartDay();
 }
 
@@ -77,7 +78,21 @@ function reportTypeDailySelect() {
     $("input#report-type").val("daily");
     $("input#report-week").parent().hide();
     $("input#report-week-preview").removeAttr("readonly");
+    $("input#report-week-preview").removeAttr("disabled");
 }
+
+function reportButtonsEnabled() {
+    $('button#generate-excel-report').removeAttr('disabled');
+    $('button#generate-word-report').removeAttr('disabled');
+    $('button#generate-preview-report').removeAttr('disabled');
+}
+
+function reportButtonsDisabled() {
+    $('button#generate-excel-report').attr('disabled', 'disabled');
+    $('button#generate-word-report').attr('disabled', 'disabled');
+    $('button#generate-preview-report').attr('disabled', 'disabled');
+}
+
 
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
@@ -106,7 +121,7 @@ function FillBoardsSucces(result) {
 function FillListsClean() {
     var container = $('div#board-lists');
     container.html('');
-    $('button#generate-report').attr('disabled', 'disabled');
+    reportButtonsDisabled();
 }
 
 function FillListsSucces(result) {
@@ -116,13 +131,13 @@ function FillListsSucces(result) {
         var label = $('<label />', { class: 'checkbox', text: this.Name }).appendTo(container);
         $('<input />', { type: 'checkbox', name: 'boardListsCb', value: this.Id, checked: 'checked' }).appendTo(label);
     });
-    $('button#generate-report').removeAttr('disabled');
+    reportButtonsEnabled();
 }
 
 function FillUsersClean() {
     var container = $('div#board-users');
     container.html('');
-    $('button#generate-report').attr('disabled', 'disabled');
+    reportButtonsDisabled();
 }
 
 function FillUsersSucces(result) {
@@ -132,7 +147,7 @@ function FillUsersSucces(result) {
         var label = $('<label />', { class: 'checkbox', text: this.FullName }).appendTo(container);
         $('<input />', { type: 'checkbox', name: 'boardUsersCb', value: this.Id, checked: 'checked' }).appendTo(label);
     });
-    $('button#generate-report').removeAttr('disabled');
+    reportButtonsEnabled();
 }
 
 function IsAuthenticated() {

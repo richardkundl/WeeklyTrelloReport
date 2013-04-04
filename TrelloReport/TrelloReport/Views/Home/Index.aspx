@@ -41,24 +41,37 @@
                 <a href="#daily" id="report-type-daily" class="btn" data-toggle="tab">Napi</a>
                 <input type="hidden" id="report-type" name="report-type" value="weekly" />
             </div>
-            <p></p>
+            <p>
+            </p>
             <div class="input-append">
                 <input type="text" id="report-week" value="" maxlength="2" class="input-mini" />
                 <span class="add-on">. hét</span>
             </div>
             <p>
-                <input type="date" name="report-week-preview" id="report-week-preview" class="input-medium"
-                    data-date-format="yy.mm.dd" readonly="readonly" /></p>
+                <input type="date" name="report-week-preview" id="report-week-preview" class="datepicker input-medium"
+                    data-date-format="yyyy-mm-dd" readonly="readonly" disabled="disabled" /></p>
         </div>
         <div class="span3">
             <p>
+                <button type="button" id="generate-excel-report" class="btn btn-primary"
+                    disabled="disabled">
+                    Excel riport készítés
+                </button>
+            </p>
+            <p>
+                <button type="button" id="generate-word-report" class="btn btn-primary"
+                    disabled="disabled">
+                    Word riport készítés
+                </button>
+            </p>
+            <p>
+                <button type="button" id="generate-preview-report" class="btn " disabled="disabled">
+                    Előnézet
+                </button>
             </p>
         </div>
     </div>
     <div class="row">
-        <button type="button" id="generate-report" class="btn btn-large btn-primary" disabled="disabled">
-            Riport készítés
-        </button>
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">
@@ -90,6 +103,8 @@
         $("a#report-type-daily").click(function () {
             reportTypeDailySelect();
         });
+
+        $('.datepicker').datepicker();
 
         $("#board-lists-selectall").click(function () {
             var checkedStatus = this.checked;
