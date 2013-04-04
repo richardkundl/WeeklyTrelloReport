@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using System.Web.Mvc;
+using TrelloNet;
 
 namespace TrelloReport.Controllers
 {
@@ -12,6 +13,23 @@ namespace TrelloReport.Controllers
         protected string GetUserKey()
         {
             return ConfigurationManager.AppSettings.Get("TrelloUserKey");
+        }
+
+        private ITrello _trelloInstance { get; set; }
+
+        protected ITrello TrelloInstance
+        {
+            get
+            {
+                if (_trelloInstance == null)
+                {
+                    _trelloInstance = new Trello(TrelloApiKey);
+                    var userKey = GetUserKey();
+                    _trelloInstance.Authorize(userKey);
+                }
+
+                return _trelloInstance;
+            }
         }
     }
 }

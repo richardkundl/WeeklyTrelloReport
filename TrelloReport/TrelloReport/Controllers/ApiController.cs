@@ -37,10 +37,7 @@ namespace TrelloReport.Controllers
 
         public ActionResult GetBoards()
         {
-            var trello = new Trello(TrelloApiKey);
-            var userKey = GetUserKey();
-            trello.Authorize(userKey);
-            var boards = trello.Boards.ForMe();
+            var boards = TrelloInstance.Boards.ForMe();
             var retBoards = new List<object>();
             foreach (var board in boards)
             {
@@ -57,10 +54,7 @@ namespace TrelloReport.Controllers
                 return CreateResponse(null);
             }
 
-            var trello = new Trello(TrelloApiKey);
-            var userKey = GetUserKey();
-            trello.Authorize(userKey);
-            var lists = trello.Lists.ForBoard(new BoardId(boardId));
+            var lists = TrelloInstance.Lists.ForBoard(new BoardId(boardId));
             var retBLists = new List<object>();
             foreach (var list in lists)
             {
@@ -76,17 +70,20 @@ namespace TrelloReport.Controllers
                 return CreateResponse(null);
             }
 
-            var trello = new Trello(TrelloApiKey);
-            var userKey = GetUserKey();
-            trello.Authorize(userKey);
-            var users = trello.Members.ForBoard(new BoardId(boardId));
+            var users = TrelloInstance.Members.ForBoard(new BoardId(boardId));
             return CreateResponse(users);
         }
 
         [HttpPost]
         public ActionResult ReportPreview(ReportModel model)
         {
-            return CreateResponse(null);
+            // ha üresek az adatok
+            if (model == null || string.IsNullOrEmpty(model.BoardId))
+            {
+                return CreateResponse(null);
+            }
+
+            return CreateResponse(12);
         }
     }
 }
