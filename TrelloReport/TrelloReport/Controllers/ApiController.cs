@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using System.Text;
 using TrelloNet;
 using System.Collections.Generic;
@@ -82,8 +83,11 @@ namespace TrelloReport.Controllers
             {
                 return CreateResponse(null);
             }
+            
+            var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
+            cards = cards.Where(c => model.ListIds.Contains(c.IdList)).ToList();
 
-            return CreateResponse(12);
+            return CreateResponse(cards);
         }
     }
 }
