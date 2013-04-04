@@ -9,7 +9,7 @@ namespace TrelloReport.Controllers
     {
         public ActionResult Index()
         {
-            var model = new HomeModel { Message = "Welcome to ASP.NET MVC!" };
+            var model = new HomeModel();
 
             return View(model);
         }
