@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using System.Text;
+using Omu.ValueInjecter;
 using TrelloNet;
 using System.Collections.Generic;
 using TrelloReport.Models;
@@ -97,7 +98,28 @@ namespace TrelloReport.Controllers
 
             // kártyák rendezése
 
-            return CreateResponse(cards);
+            var separeted = new List<Card>();
+            foreach (var card in cards)
+            {
+                // ha több label-je van, akkor külön-külön fel kell venni
+                if (card.Labels.Count > 1)
+                {
+                    foreach (var label in card.Labels)
+                    {
+                        var newCard = new Card();
+                        newCard.InjectFrom(card);
+                        newCard.Labels = new List<Card.Label>();
+                        newCard.Labels.Add(label);
+                        separeted.Add(newCard);
+                    }
+                }
+                else
+                {
+                    separeted.Add(card);
+                }
+            }
+
+            return CreateResponse(separeted);
         }
     }
 }
