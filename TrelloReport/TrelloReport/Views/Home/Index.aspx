@@ -78,8 +78,17 @@
     <div class="row">
         <script id="Handlebars-Template" type="text/x-handlebars-template">
 			  {{#each Cards}}
-			  	<div class='card'>
-				  	<h3>{{Name}}</h3>
+			  	<div class="well well-small">
+                    <p>
+                    {{#if Labels}}
+                        {{#each Labels}}
+                        <span class="label">{{Name}}</span>
+                        {{/each}}
+                    {{else}}
+                        <span class="label">Egyéb</span>
+                    {{/if}}
+                    </p>
+				  	<p><a href="{{Url}}" title="{{Name}}">{{Name}}</a></p>
                     <ul>
                         {{#each Members}}
                         <li>{{FullName}}</li>
