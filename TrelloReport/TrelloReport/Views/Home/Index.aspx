@@ -76,6 +76,7 @@
         </div>
     </div>
     <div class="row">
+        <h6>Előnézet:</h6>
         <script id="Handlebars-Template" type="text/x-handlebars-template">
 			  {{#each Cards}}
 			  	<div class="well well-small">

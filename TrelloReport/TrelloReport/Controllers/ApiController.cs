@@ -96,7 +96,7 @@ namespace TrelloReport.Controllers
 
             // kártyák szűrése idő intervallumra
 
-            // kártyák rendezése
+           
 
             var separeted = new List<Card>();
             foreach (var card in cards)
@@ -118,6 +118,9 @@ namespace TrelloReport.Controllers
                     separeted.Add(card);
                 }
             }
+
+            // kártyák rendezése
+            //var ordered = separeted.OrderBy(c => c.Labels, CardComparer.CompareByLabel);
 
             return CreateResponse(separeted);
         }
