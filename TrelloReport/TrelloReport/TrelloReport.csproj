@@ -44,6 +44,9 @@
     <Reference Include="NPOI">
       <HintPath>..\packages\NPOI.1.2.5\lib\net40\NPOI.dll</HintPath>
     </Reference>
+    <Reference Include="Omu.ValueInjecter">
+      <HintPath>..\packages\ValueInjecter.2.3.3\lib\net35\Omu.ValueInjecter.dll</HintPath>
+    </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
     </Reference>
@@ -140,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
