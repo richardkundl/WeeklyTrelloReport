@@ -11,34 +11,35 @@
     </div>
     <div class="row">
         <div class="span5 form-horizontal">
-            <h6> <span class="badge badge-info">1</span>
-                Tábla:</h6>
+            <h6>
+                <span class="badge badge-info">1</span> Tábla:</h6>
             <select id="trello-boards" class="span3">
                 <option value="" selected="selected">Válassz egyet</option>
             </select>
         </div>
     </div>
-    <div class="row"></div>
+    <div class="row">
+    </div>
     <div class="row">
         <div class="span3">
-            <h6> <span class="badge badge-info">2</span>
-                Lista:</h6>
+            <h6>
+                <span class="badge badge-info">2</span> Lista:</h6>
             <label class="checkbox">
                 <input type="checkbox" checked="checked" id="board-lists-selectall" />Összes</label>
             <div id="board-lists">
             </div>
         </div>
         <div class="span3">
-            <h6> <span class="badge badge-info">3</span>
-                Felhasználó:</h6>
+            <h6>
+                <span class="badge badge-info">3</span> Felhasználó:</h6>
             <label class="checkbox">
                 <input type="checkbox" checked="checked" id="board-users-selectall" />Összes</label>
             <div id="board-users">
             </div>
         </div>
         <div class="span3">
-            <h6> <span class="badge badge-info">4</span>
-                Típus:</h6>
+            <h6>
+                <span class="badge badge-info">4</span> Típus:</h6>
             <div id="tab" class="btn-group" data-toggle="buttons-radio">
                 <a href="#weekly" id="report-type-weekly" class="btn active" data-toggle="tab">Heti</a>
                 <a href="#daily" id="report-type-daily" class="btn" data-toggle="tab">Napi</a>
@@ -55,8 +56,8 @@
                     data-date-format="yyyy-mm-dd" readonly="readonly" disabled="disabled" /></p>
         </div>
         <div class="span3">
-            <h6> <span class="badge badge-info">5</span>
-                Riport:</h6>
+            <h6>
+                <span class="badge badge-info">5</span> Riport:</h6>
             <p>
                 <button type="button" id="generate-excel-report" class="btn btn-primary" disabled="disabled">
                     Excel riport készítés
@@ -75,7 +76,20 @@
         </div>
     </div>
     <div class="row">
-        <div id="preview-data"></div>
+        <script id="Handlebars-Template" type="text/x-handlebars-template">
+			  {{#each Cards}}
+			  	<div class='card'>
+				  	<h3>{{Name}}</h3>
+                    <ul>
+                        {{#each Members}}
+                        <li>{{FullName}}</li>
+                        {{/each}}
+                    </ul>
+			  	</div>
+			  {{/each}}
+        </script>
+        <div id="preview-data">
+        </div>
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">

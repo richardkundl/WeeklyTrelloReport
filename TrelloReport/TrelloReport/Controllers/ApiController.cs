@@ -93,7 +93,7 @@ namespace TrelloReport.Controllers
             // kártyák szűrése felhasználóar
             cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
 
-            // kártyák szűrése intervallimra
+            // kártyák szűrése idő intervallumra
 
             return CreateResponse(cards);
         }

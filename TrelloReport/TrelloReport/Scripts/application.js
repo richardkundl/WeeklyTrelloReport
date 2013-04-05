@@ -1,6 +1,5 @@
 ﻿/// <reference path="jquery-1.9.1-vsdoc.js" />
-/// <reference path="handlebars.runtime.js" />
-
+/// <reference path="handlebars.js" />
 
 Date.prototype.getWeek = function () {
     var onejan = new Date(this.getFullYear(), 0, 1);
@@ -269,7 +268,7 @@ function ReportPreview() {
 
     var request = $.ajax({
         url: urlReportPreview,
-        //  traditional: true | it wac required if sending List<POCO> data
+        //  traditional: true | it was required if sending List<POCO> data
         traditional: true,
         type: "POST",
         data: data,
@@ -277,7 +276,11 @@ function ReportPreview() {
     });
 
     request.done(function (result) {
-        $("#preview-data").html(result.toString());
+        var cards = result;
+        var source = document.getElementById("Handlebars-Template").textContent;
+        var template = Handlebars.compile(source);
+        var html = template({ Cards: cards });
+        $("#preview-data").html(html);
     });
 
     request.fail(function (jqXHR, textStatus) {
