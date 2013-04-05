@@ -84,8 +84,16 @@ namespace TrelloReport.Controllers
                 return CreateResponse(null);
             }
             
+            // kártyák lekérdezése
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
-            cards = cards.Where(c => model.ListIds.Contains(c.IdList)).ToList();
+
+            // kártyák szűrése táblára
+            cards = cards.Where(c => model.ListIds.Contains(c.IdList));
+
+            // kártyák szűrése felhasználóar
+            cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
+
+            // kártyák szűrése intervallimra
 
             return CreateResponse(cards);
         }
