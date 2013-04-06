@@ -120,9 +120,10 @@ namespace TrelloReport.Controllers
             }
 
             // kártyák rendezése
-            //var ordered = separeted.OrderBy(c => c.Labels, CardComparer.CompareByLabel);
+            var comparer = new CardComparer();
+            var ordered = separeted.OrderBy(c => c.Labels, comparer);
 
-            return CreateResponse(separeted);
+            return CreateResponse(ordered);
         }
     }
 }

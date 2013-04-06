@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using TrelloNet;
 
-public static class CardComparer
+public class CardComparer: IComparer<List<Card.Label>>
 {
-    public static int CompareByLabel(List<Card.Label> labelsA, List<Card.Label> labelsB)
+    public int Compare(List<Card.Label> labelsA, List<Card.Label> labelsB)
     {
         if ((labelsA == null || labelsA.Count == 0) &&
             (labelsB == null || labelsB.Count == 0))
