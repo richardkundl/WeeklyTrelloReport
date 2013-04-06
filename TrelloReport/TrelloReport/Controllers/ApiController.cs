@@ -6,6 +6,7 @@ using TrelloNet;
 using System.Collections.Generic;
 using TrelloReport.Models;
 using System;
+using Action = TrelloNet.Action;
 
 namespace TrelloReport.Controllers
 {
@@ -22,6 +23,38 @@ namespace TrelloReport.Controllers
                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
                       };
             return result;
+        }
+
+        private static IEnumerable<ActionType> CardActionTypes
+        {
+            get
+            {
+                return new List<ActionType>
+                              {
+                                  ActionType.AddMemberToCard,
+                                  ActionType.CreateCard,
+                                  ActionType.AddAttachmentToCard,
+                                  ActionType.AddChecklistToCard,
+                                  ActionType.CommentCard,
+                                  ActionType.ConvertToCardFromCheckItem,
+                                  ActionType.MoveCardFromBoard,
+                                  ActionType.MoveCardToBoard,
+                                  ActionType.RemoveChecklistFromCard,
+                                  ActionType.RemoveMemberFromCard,
+                                  ActionType.UpdateCard,
+                                  ActionType.UpdateCheckItemStateOnCard
+                              };
+            }
+        }
+
+        private static string GetCardIdFromAction(Action action)
+        {
+            if (action is AddMemberToCardAction)
+            {
+                return (action as AddMemberToCardAction).Data.Card.GetCardId();
+            }
+
+            return string.Empty;
         }
 
         public ActionResult IsAuthenticated()
@@ -76,30 +109,62 @@ namespace TrelloReport.Controllers
         [HttpPost]
         public ActionResult ReportPreview(ReportModel model)
         {
-            // ha üresek az adatok
+            // if input data is empty
             if (model == null || string.IsNullOrEmpty(model.BoardId))
             {
                 return CreateResponse(null);
             }
 
-            // kártyák lekérdezése
+            // set query start date 
+            var startDate = Convert.ToDateTime(model.StartDate).Date;
+            if (startDate.Year < DateTime.Now.Year - 1)
+            {
+                startDate = DateTime.Now.Date;
+            }
+
+            // set query end date
+            DateTime endDate;
+            if (model.ReportIntervalType == "weekly")
+            {
+                //  need last day 23h59m time  
+                endDate = startDate.Date.AddDays(7).AddMinutes(-1);
+            }
+            else if (model.ReportIntervalType == "daily")
+            {
+                endDate = startDate.Date.AddDays(1).AddMinutes(-1);
+            }
+            else
+            {
+                endDate = DateTime.Now.Date.AddDays(1).AddMinutes(-1);
+            }
+
+            // query cards
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
 
-            // kártyák szűrése táblára
+            // filter cards by lists
             cards = cards.Where(c => model.ListIds.Contains(c.IdList));
 
-            // kártyák szűrése felhasználóra
+            // filter cards by user
             cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
 
-            // kártyák szűrése idő intervallumra
-            var since = Since.Date(Convert.ToDateTime(model.StartDate));
-            var actions = TrelloInstance.Actions.ForBoard(new BoardId(model.BoardId), since: since);
+            // filter cards by date intervall
+            var actions = TrelloInstance.Actions.ForBoard(
+                            new BoardId(model.BoardId),
+                            since: Since.Date(startDate),
+                            paging: new Paging(1000, 0),
+                            filter: CardActionTypes);
+            var changedCardActions = actions.Where(a => a.Date > startDate && a.Date < endDate).ToList();
+            var changedCardIds = new List<string>();
+            foreach (var changedCardAction in changedCardActions)
+            {
+                changedCardIds.Add(GetCardIdFromAction(changedCardAction));
+            }
 
-            // kártyák szétválasztása labelek alapján
+            // separated cards by labels
             var separeted = new List<Card>();
             foreach (var card in cards)
             {
-                // ha több label-je van, akkor külön-külön fel kell venni
+                // if more than one label, you should be separately
                 if (card.Labels.Count > 1)
                 {
                     foreach (var label in card.Labels)
@@ -116,7 +181,7 @@ namespace TrelloReport.Controllers
                 }
             }
 
-            // kártyák rendezése
+            // order cards by list->label names->position
             var comparer = new CardComparer();
             var ordered = separeted.OrderBy(c => c.IdList)
                                 .ThenBy(c => c.Labels, comparer)
