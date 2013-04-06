@@ -1,14 +1,15 @@
 ﻿/// <reference path="jquery-1.9.1-vsdoc.js" />
 /// <reference path="handlebars.js" />
 
-Handlebars.registerHelper('listName', function (card) {
+Handlebars.registerHelper('ListName', function (idList) {
+    var ret = idList;
     $.each(lists, function () {
-        if (this.Id == card.IdList) {
-            return this.Name;
+        if (this.Id == idList) {
+            ret = this.Name;
         }
     });
 
-    return card.IdList;
+    return ret;
 });
 
 Date.prototype.getWeek = function () {

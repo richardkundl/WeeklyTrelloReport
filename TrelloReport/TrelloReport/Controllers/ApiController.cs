@@ -118,7 +118,9 @@ namespace TrelloReport.Controllers
 
             // kártyák rendezése
             var comparer = new CardComparer();
-            var ordered = separeted.OrderBy(c => c.IdList).ThenBy(c => c.Labels, comparer);
+            var ordered = separeted.OrderBy(c => c.IdList)
+                                .ThenBy(c => c.Labels, comparer)
+                                .ThenBy(c => c.Pos);
 
             return CreateResponse(ordered);
         }

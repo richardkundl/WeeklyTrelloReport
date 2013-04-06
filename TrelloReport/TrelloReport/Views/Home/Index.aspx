@@ -89,7 +89,7 @@
                         <span class="label">Egyéb</span>
                     {{/if}}
                     </p>
-				  	<p><a href="{{Url}}" title="{{Name}}">{{Name}}</a></p>
+				  	<p><a href="{{Url}}" title="{{Name}}">{{ListName IdList}}-{{Name}}</a></p>
                     <ul>
                         {{#each Members}}
                         <li>{{FullName}}</li>
