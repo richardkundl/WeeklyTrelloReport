@@ -1,10 +1,35 @@
 ﻿/// <reference path="jquery-1.9.1-vsdoc.js" />
 /// <reference path="handlebars.js" />
 
+Handlebars.registerHelper('listName', function (card) {
+    $.each(lists, function () {
+        if (this.Id == card.IdList) {
+            return this.Name;
+        }
+    });
+
+    return card.IdList;
+});
+
 Date.prototype.getWeek = function () {
     var onejan = new Date(this.getFullYear(), 0, 1);
     return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
 };
+
+var boards;
+
+function Board(id, name) {
+    this.Id = id;
+    this.Name = name;
+}
+
+var lists;
+
+function List(id, name, pos) {
+    this.Id = id;
+    this.Name = name;
+    this.Pos = pos;
+}
 
 function toTwoDigitNumber(number) {
     if (number.toString().length > 1) {
@@ -118,6 +143,17 @@ function getCheckdItems(selector) {
     return names;
 }
 
+function collectReportParameter() {
+    var boardId = getSelectedBoard();
+    var reportIntervalType = getReportTypeInterval();
+    var startDate = getReportStartDate();
+    var listIds = getCheckdItems("div#board-lists input:checked");
+    var userIds = getCheckdItems("div#board-users input:checked");
+
+    var data = { boardId: boardId, listIds: listIds, userIds: userIds, reportIntervalType: reportIntervalType, startDate: startDate };
+    return data;
+}
+
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
 var urlFillLists = "/api/getlists";
@@ -137,22 +173,38 @@ function IsAuthenticatedSucces(result) {
 };
 
 function FillBoardsSucces(result) {
+    boards = [];
     $.each(result, function () {
+        boards.push(new Board(this.Id, this.Name));
+    });
+    BindBoards();
+};
+
+function BindBoards() {
+    $.each(boards, function () {
         var container = $("select#trello-boards");
         container.append($("<option />").val(this.Id).text(this.Name));
     });
 };
 
 function FillListsClean() {
+    lists = [];
     var container = $('div#board-lists');
     container.html('');
     reportButtonsDisabled();
 }
 
 function FillListsSucces(result) {
-    var container = $('div#board-lists');
-    container.html('');
+    FillListsClean();
     $.each(result, function () {
+        lists.push(new List(this.Id, this.Name, this.Pos));
+     });
+    BindLists();
+}
+
+function BindLists() {
+    var container = $('div#board-lists');
+    $.each(lists, function () {
         var label = $('<label />', { class: 'checkbox', text: this.Name }).appendTo(container);
         $('<input />', { type: 'checkbox', name: 'boardListsCb', value: this.Id, checked: 'checked' }).appendTo(label);
     });
@@ -173,6 +225,14 @@ function FillUsersSucces(result) {
         $('<input />', { type: 'checkbox', name: 'boardUsersCb', value: this.Id, checked: 'checked' }).appendTo(label);
     });
     reportButtonsEnabled();
+}
+
+function ReportPreviewSucces(result) {
+    var cards = result;
+    var source = document.getElementById("Handlebars-Template").textContent;
+    var template = Handlebars.compile(source);
+    var html = template({ Cards: cards });
+    $("#preview-data").html(html);
 }
 
 function IsAuthenticated() {
@@ -258,14 +318,7 @@ function FillLists(boardId) {
 }
 
 function ReportPreview() {
-    var boardId = getSelectedBoard();
-    var reportIntervalType = getReportTypeInterval();
-    var startDate = getReportStartDate();
-    var listIds = getCheckdItems("div#board-lists input:checked");
-    var userIds = getCheckdItems("div#board-users input:checked");
-
-    var data = { boardId: boardId, listIds: listIds, userIds: userIds, reportIntervalType: reportIntervalType, startDate: startDate };
-
+    var data = collectReportParameter();
     var request = $.ajax({
         url: urlReportPreview,
         //  traditional: true | it was required if sending List<POCO> data
@@ -276,11 +329,7 @@ function ReportPreview() {
     });
 
     request.done(function (result) {
-        var cards = result;
-        var source = document.getElementById("Handlebars-Template").textContent;
-        var template = Handlebars.compile(source);
-        var html = template({ Cards: cards });
-        $("#preview-data").html(html);
+        ReportPreviewSucces(result);
     });
 
     request.fail(function (jqXHR, textStatus) {
