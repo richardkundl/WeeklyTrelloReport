@@ -5,6 +5,7 @@ using Omu.ValueInjecter;
 using TrelloNet;
 using System.Collections.Generic;
 using TrelloReport.Models;
+using System;
 
 namespace TrelloReport.Controllers
 {
@@ -13,13 +14,13 @@ namespace TrelloReport.Controllers
     {
         private JsonResult CreateResponse(object data)
         {
-             var result = new JsonResult
-                       {
-                           ContentEncoding = Encoding.UTF8,
-                           ContentType = "application/json",
-                           Data = data,
-                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                       };
+            var result = new JsonResult
+                      {
+                          ContentEncoding = Encoding.UTF8,
+                          ContentType = "application/json",
+                          Data = data,
+                          JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                      };
             return result;
         }
 
@@ -32,18 +33,19 @@ namespace TrelloReport.Controllers
             {
                 // generate auth url
                 var link = new Trello(TrelloApiKey).GetAuthorizationUrl(TrelloAppName, Scope.ReadOnly, Expiration.Never).ToString();
-                return CreateResponse(new {isLogged = false, authUrl = link});
+                return CreateResponse(new { isLogged = false, authUrl = link });
             }
+
             return CreateResponse(new { isLogged = true, authUrl = string.Empty });
         }
 
         public ActionResult GetBoards()
         {
-            var boards = TrelloInstance.Boards.ForMe();
+            var boards = TrelloInstance.Boards.ForMe().OrderBy(b => b.Name);
             var retBoards = new List<object>();
             foreach (var board in boards)
             {
-                retBoards.Add(new {board.Id,board.Name, board.Closed, board.IdOrganization });
+                retBoards.Add(new { board.Id, board.Name, board.Closed, board.IdOrganization, board.Desc });
             }
             return CreateResponse(retBoards);
         }
@@ -51,18 +53,13 @@ namespace TrelloReport.Controllers
 
         public ActionResult GetLists(string boardId)
         {
-            if(string.IsNullOrEmpty(boardId))
+            if (string.IsNullOrEmpty(boardId))
             {
                 return CreateResponse(null);
             }
 
-            var lists = TrelloInstance.Lists.ForBoard(new BoardId(boardId));
-            var retBLists = new List<object>();
-            foreach (var list in lists)
-            {
-                retBLists.Add(new { list.Id, list.Name, list.Closed, list.Pos });
-            }
-            return CreateResponse(retBLists);
+            var lists = TrelloInstance.Lists.ForBoard(new BoardId(boardId)).OrderBy(l => l.Pos);
+            return CreateResponse(lists);
         }
 
         public ActionResult GetUsersOnBoard(string boardId)
@@ -84,20 +81,21 @@ namespace TrelloReport.Controllers
             {
                 return CreateResponse(null);
             }
-            
+
             // kártyák lekérdezése
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
 
             // kártyák szűrése táblára
             cards = cards.Where(c => model.ListIds.Contains(c.IdList));
 
-            // kártyák szűrése felhasználóar
+            // kártyák szűrése felhasználóra
             cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
 
             // kártyák szűrése idő intervallumra
+            var since = Since.Date(Convert.ToDateTime(model.StartDate));
+            var actions = TrelloInstance.Actions.ForBoard(new BoardId(model.BoardId), since: since);
 
-           
-
+            // kártyák szétválasztása labelek alapján
             var separeted = new List<Card>();
             foreach (var card in cards)
             {
@@ -108,8 +106,7 @@ namespace TrelloReport.Controllers
                     {
                         var newCard = new Card();
                         newCard.InjectFrom(card);
-                        newCard.Labels = new List<Card.Label>();
-                        newCard.Labels.Add(label);
+                        newCard.Labels = new List<Card.Label> { label };
                         separeted.Add(newCard);
                     }
                 }
@@ -121,7 +118,7 @@ namespace TrelloReport.Controllers
 
             // kártyák rendezése
             var comparer = new CardComparer();
-            var ordered = separeted.OrderBy(c => c.Labels, comparer);
+            var ordered = separeted.OrderBy(c => c.IdList).ThenBy(c => c.Labels, comparer);
 
             return CreateResponse(ordered);
         }
