@@ -17,6 +17,14 @@ Date.prototype.getWeek = function () {
     return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
 };
 
+Date.prototype.currentDate = function () {
+    var currentTime = new Date();
+    var month = currentTime.getMonth() + 1;
+    var day = currentTime.getDate();
+    var year = currentTime.getFullYear();
+    return (year + "-" + month + "-" + day);
+};
+
 var boards;
 
 function Board(id, name) {
@@ -93,6 +101,14 @@ function recalculateWeekStartDay() {
     }
 
     $("input#report-week-preview").val(startDateOfWeek(week));
+}
+
+function reportTypeActuallySelect() {
+    $("input#report-type").val("actually");
+    $("input#report-week").parent().hide();
+    $("input#report-week-preview").attr('readonly', 'readonly');
+    $("input#report-week-preview").attr('disabled', 'disabled');
+    $("input#report-week-preview").val(new Date().currentDate);
 }
 
 function reportTypeWeeklySelect() {

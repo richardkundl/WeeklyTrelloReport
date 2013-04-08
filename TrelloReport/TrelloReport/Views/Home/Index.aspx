@@ -41,9 +41,10 @@
             <h6>
                 <span class="badge badge-info">4</span> Típus:</h6>
             <div id="tab" class="btn-group" data-toggle="buttons-radio">
-                <a href="#weekly" id="report-type-weekly" class="btn active" data-toggle="tab">Heti</a>
+                <a href="#actually" id="report-type-actually" class="btn active" data-toggle="tab">Aktuális</a>
+                <a href="#weekly" id="report-type-weekly" class="btn" data-toggle="tab">Heti</a>
                 <a href="#daily" id="report-type-daily" class="btn" data-toggle="tab">Napi</a>
-                <input type="hidden" id="report-type" name="report-type" value="weekly" />
+                <input type="hidden" id="report-type" name="report-type" value="actually" />
             </div>
             <p>
             </p>
@@ -110,6 +111,8 @@
             IsAuthenticated();
 
             weekNumberSetDefault();
+
+            reportTypeActuallySelect();
         });
 
         $("#trello-boards").change(function () {
@@ -138,6 +141,10 @@
             reportTypeDailySelect();
         });
 
+        $("a#report-type-actually").click(function () {
+            reportTypeActuallySelect();
+        });
+        
         $('.datepicker').datepicker();
 
         $("#board-lists-selectall").click(function () {
