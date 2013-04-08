@@ -164,15 +164,15 @@ namespace TrelloReport.Helper
         }
 
         /// <summary>
-        /// Order cards by list->label names->position
+        /// Order cards by labels->list->position
         /// </summary>
         /// <param name="cards">Unordered cards</param>
         /// <returns>Ordered cards</returns>
         public static IEnumerable<Card> OrderCards(IEnumerable<Card> cards)
         {
             var comparer = new CardComparer();
-            var ordered = cards.OrderBy(c => c.IdList)
-                                .ThenBy(c => c.Labels, comparer)
+            var ordered = cards.OrderBy(c => c.Labels, comparer)
+                                .ThenBy(c => c.IdList)
                                 .ThenBy(c => c.Pos)
                                 .ToList();
             return ordered;
