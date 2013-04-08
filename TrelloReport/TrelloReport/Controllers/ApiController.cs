@@ -76,8 +76,33 @@ namespace TrelloReport.Controllers
             {
                 endDate = startDate.Date.AddDays(1).AddMinutes(-1);
             }
+            else if (interval == "actually")
+            {
+                // do nothing, is setted
+            }
 
             return endDate;
+        }
+
+        /// <summary>
+        /// Calculate start date
+        /// </summary>
+        /// <param name="startdate">input start date</param>
+        /// <param name="interval">Report interval</param>
+        /// <returns></returns>
+        private static DateTime GetStartDate(string startdate, string interval)
+        {
+            var startDate = Convert.ToDateTime(startdate).Date;
+            if (startDate.Year < DateTime.Now.Year - 1)
+            {
+                startDate = DateTime.Now.Date;
+            }
+            if (interval == "actually")
+            {
+                startDate = DateTime.Now.Date;
+            }
+
+            return startDate;
         }
 
         /// <summary>
@@ -176,6 +201,51 @@ namespace TrelloReport.Controllers
         }
 
         /// <summary>
+        /// Separate <paramref name="cards"/> by card labels
+        /// </summary>
+        /// <param name="cards">Unsepareted cards</param>
+        /// <returns>Separeted cards</returns>
+        private static IEnumerable<Card> SepareteCardByLabels(IEnumerable<Card> cards)
+        {
+            var separeted = new List<Card>();
+            foreach (var card in cards)
+            {
+                // if more than one label, you should be separately
+                if (card.Labels.Count > 1)
+                {
+                    foreach (var label in card.Labels)
+                    {
+                        var newCard = new Card();
+                        newCard.InjectFrom(card);
+                        newCard.Labels = new List<Card.Label> { label };
+                        separeted.Add(newCard);
+                    }
+                }
+                else
+                {
+                    separeted.Add(card);
+                }
+            }
+
+            return separeted;
+        }
+
+        /// <summary>
+        /// Order cards by list->label names->position
+        /// </summary>
+        /// <param name="cards">Unordered cards</param>
+        /// <returns>Ordered cards</returns>
+        private static IEnumerable<Card> OrderCards(IEnumerable<Card> cards)
+        {
+            var comparer = new CardComparer();
+            var ordered = cards.OrderBy(c => c.IdList)
+                                .ThenBy(c => c.Labels, comparer)
+                                .ThenBy(c => c.Pos)
+                                .ToList();
+            return ordered;
+        }
+
+        /// <summary>
         /// User is Trello authenticated
         /// </summary>
         /// <returns>Bool and auth url</returns>
@@ -256,11 +326,7 @@ namespace TrelloReport.Controllers
             }
 
             // set query start date 
-            var startDate = Convert.ToDateTime(model.StartDate).Date;
-            if (startDate.Year < DateTime.Now.Year - 1)
-            {
-                startDate = DateTime.Now.Date;
-            }
+            var startDate = GetStartDate(model.StartDate, model.ReportIntervalType);
 
             // set query end date
             var endDate = GetEndDate(startDate, model.ReportIntervalType);
@@ -268,8 +334,15 @@ namespace TrelloReport.Controllers
             // query cards
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
 
-            // query card actions
-            var changedCards = GetCardIdsFromActions(TrelloInstance, model.BoardId, startDate, endDate);
+            // if interval type is actually, doesn't need activity filter
+            if (model.ReportIntervalType != "actually")
+            {
+                // query card actions
+                var changedCards = GetCardIdsFromActions(TrelloInstance, model.BoardId, startDate, endDate);
+
+                // filter cards by date interval
+                cards = cards.Where(c => changedCards.Contains(c.Id));
+            }
 
             // filter cards by lists
             cards = cards.Where(c => model.ListIds.Contains(c.IdList));
@@ -277,37 +350,13 @@ namespace TrelloReport.Controllers
             // filter cards by user
             cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
 
-            // filter cards by date interval
-            cards = cards.Where(c => changedCards.Contains(c.Id));
-
             // separated cards by labels
-            var separeted = new List<Card>();
-            foreach (var card in cards)
-            {
-                // if more than one label, you should be separately
-                if (card.Labels.Count > 1)
-                {
-                    foreach (var label in card.Labels)
-                    {
-                        var newCard = new Card();
-                        newCard.InjectFrom(card);
-                        newCard.Labels = new List<Card.Label> { label };
-                        separeted.Add(newCard);
-                    }
-                }
-                else
-                {
-                    separeted.Add(card);
-                }
-            }
+            cards = SepareteCardByLabels(cards);
 
-            // order cards by list->label names->position
-            var comparer = new CardComparer();
-            var ordered = separeted.OrderBy(c => c.IdList)
-                                .ThenBy(c => c.Labels, comparer)
-                                .ThenBy(c => c.Pos);
+            // order cards 
+            cards = OrderCards(cards);
 
-            return CreateResponse(ordered);
+            return CreateResponse(cards);
         }
     }
 }
