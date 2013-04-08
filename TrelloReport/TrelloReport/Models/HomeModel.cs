@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using TrelloNet;
-
-namespace TrelloReport.Models
+﻿namespace TrelloReport.Models
 {
+    /// <summary>
+    /// Home controller Model
+    /// </summary>
     public class HomeModel
     {
-        public string Message { get; set; }
-
-        public Uri TrelloAuthUrl { get; set; }
-
-        public string TrelloUserKey { get; set; }
-
-        public IEnumerable<Board> Boards { get; set; }
+        /// <summary>
+        /// Message
+        /// </summary>
+        public string Message { get; set; }      
     }
 }

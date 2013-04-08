@@ -1,8 +1,17 @@
 ﻿using System.Collections.Generic;
 using TrelloNet;
 
+/// <summary>
+/// Trello card comparer
+/// </summary>
 public class CardComparer: IComparer<List<Card.Label>>
 {
+    /// <summary>
+    /// Custom compare to card labels
+    /// </summary>
+    /// <param name="labelsA">(A) Card labels</param>
+    /// <param name="labelsB">(B) Card labels</param>
+    /// <returns>A-B relation</returns>
     public int Compare(List<Card.Label> labelsA, List<Card.Label> labelsB)
     {
         if ((labelsA == null || labelsA.Count == 0) &&

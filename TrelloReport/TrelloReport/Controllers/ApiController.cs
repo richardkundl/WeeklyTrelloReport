@@ -11,8 +11,16 @@ using Action = TrelloNet.Action;
 namespace TrelloReport.Controllers
 {
     // TODO: Ezeket majd az authorize filterre kötni, amit a majd trello belépéshez illesztünk
+    /// <summary>
+    /// Api controller
+    /// </summary>
     public class ApiController : BaseController
     {
+        /// <summary>
+        /// Create JSON response
+        /// </summary>
+        /// <param name="data">responsed data</param>
+        /// <returns>Complete JSON data</returns>
         private JsonResult CreateResponse(object data)
         {
             var result = new JsonResult
@@ -25,6 +33,9 @@ namespace TrelloReport.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Card action types
+        /// </summary>
         private static IEnumerable<ActionType> CardActionTypes
         {
             get
@@ -47,6 +58,33 @@ namespace TrelloReport.Controllers
             }
         }
 
+        /// <summary>
+        /// Calculate end date with interval
+        /// </summary>
+        /// <param name="startDate">Start date</param>
+        /// <param name="interval">Report interval(eg: weekly, daily)</param>
+        /// <returns>Calculated end date</returns>
+        private static DateTime GetEndDate(DateTime startDate, string interval)
+        {
+            var endDate = DateTime.Now.Date.AddDays(1).AddMinutes(-1);
+            if (interval == "weekly")
+            {
+                //  need last day 23h59m time  
+                endDate = startDate.Date.AddDays(7).AddMinutes(-1);
+            }
+            else if (interval == "daily")
+            {
+                endDate = startDate.Date.AddDays(1).AddMinutes(-1);
+            }
+
+            return endDate;
+        }
+
+        /// <summary>
+        /// Get card Id from action(only card action)
+        /// </summary>
+        /// <param name="action">Trello action</param>
+        /// <returns> if exits card Id, else empty string</returns>
         private static string GetCardIdFromAction(Action action)
         {
             if (action is AddMemberToCardAction)
@@ -101,6 +139,14 @@ namespace TrelloReport.Controllers
             return string.Empty;
         }
 
+        /// <summary>
+        /// Get card Ids from all action
+        /// </summary>
+        /// <param name="trello">trello interface</param>
+        /// <param name="boardId">board Id</param>
+        /// <param name="startDate">filter start date</param>
+        /// <param name="endDate">filter end date</param>
+        /// <returns>List of card ids</returns>
         private static List<string> GetCardIdsFromActions(ITrello trello, string boardId, DateTime startDate, DateTime endDate)
         {
             var actions = trello.Actions.ForBoard(
@@ -129,7 +175,10 @@ namespace TrelloReport.Controllers
             return changedCardIds;
         }
 
-
+        /// <summary>
+        /// User is Trello authenticated
+        /// </summary>
+        /// <returns>Bool and auth url</returns>
         public ActionResult IsAuthenticated()
         {
             var userKey = GetUserKey();
@@ -145,6 +194,10 @@ namespace TrelloReport.Controllers
             return CreateResponse(new { isLogged = true, authUrl = string.Empty });
         }
 
+        /// <summary>
+        /// Get user boards
+        /// </summary>
+        /// <returns>User boars</returns>
         public ActionResult GetBoards()
         {
             var boards = TrelloInstance.Boards.ForMe().OrderBy(b => b.Name);
@@ -156,7 +209,11 @@ namespace TrelloReport.Controllers
             return CreateResponse(retBoards);
         }
 
-
+        /// <summary>
+        /// Get lists from board
+        /// </summary>
+        /// <param name="boardId">Board Id</param>
+        /// <returns>Actually board lists</returns>
         public ActionResult GetLists(string boardId)
         {
             if (string.IsNullOrEmpty(boardId))
@@ -168,6 +225,11 @@ namespace TrelloReport.Controllers
             return CreateResponse(lists);
         }
 
+        /// <summary>
+        /// Get users from board
+        /// </summary>
+        /// <param name="boardId">Board Id</param>
+        /// <returns>Actually users in board</returns>
         public ActionResult GetUsersOnBoard(string boardId)
         {
             if (string.IsNullOrEmpty(boardId))
@@ -179,6 +241,11 @@ namespace TrelloReport.Controllers
             return CreateResponse(users);
         }
 
+        /// <summary>
+        /// Create report preview
+        /// </summary>
+        /// <param name="model">input model</param>
+        /// <returns>filtered and ordered cards</returns>
         [HttpPost]
         public ActionResult ReportPreview(ReportModel model)
         {
@@ -196,20 +263,7 @@ namespace TrelloReport.Controllers
             }
 
             // set query end date
-            DateTime endDate;
-            if (model.ReportIntervalType == "weekly")
-            {
-                //  need last day 23h59m time  
-                endDate = startDate.Date.AddDays(7).AddMinutes(-1);
-            }
-            else if (model.ReportIntervalType == "daily")
-            {
-                endDate = startDate.Date.AddDays(1).AddMinutes(-1);
-            }
-            else
-            {
-                endDate = DateTime.Now.Date.AddDays(1).AddMinutes(-1);
-            }
+            var endDate = GetEndDate(startDate, model.ReportIntervalType);
 
             // query cards
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
