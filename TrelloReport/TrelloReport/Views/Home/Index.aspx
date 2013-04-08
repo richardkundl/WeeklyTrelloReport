@@ -123,6 +123,10 @@
             ReportPreview();
         });
 
+        $("button#generate-word-report").click(function () {
+            ReportWord();
+        });
+
         $("#report-week").keyup(function () {
             recalculateWeekStartDay();
         });

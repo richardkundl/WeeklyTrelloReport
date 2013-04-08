@@ -1,6 +1,33 @@
 ﻿/// <reference path="jquery-1.9.1-vsdoc.js" />
 /// <reference path="handlebars.js" />
 
+function IsArray(obj) {
+    if (obj instanceof Array) {
+        return true;
+    }
+
+    if (typeof obj !== 'object') {
+        return false;
+    }
+
+    if (typeOf(obj) === 'array') {
+        return true;
+    }
+
+    return false;
+};
+
+function typeOf(obj) {
+    if (obj === null || typeof obj === 'undefined') {
+        return String(obj);
+    }
+
+    return Object.prototype.toString
+        .call(obj)
+        .replace(/\[object ([a-zA-Z]+)\]/, '$1')
+        .toLowerCase();
+};
+
 Handlebars.registerHelper('ListName', function (idList) {
     var ret = idList;
     $.each(lists, function () {
@@ -183,11 +210,31 @@ function collectReportParameter() {
     return data;
 }
 
+function submitValues(url, params) {
+    var form = ['<form method="POST" action="', url, '">'];
+
+    for (var key in params) {
+        var paramValue = params[key];
+        if (IsArray(paramValue)) {
+            for (var value in paramValue) {
+                form.push('<input type="hidden" name="', key, '" value="', paramValue[value], '"/>');
+            }
+        } else {
+            form.push('<input type="hidden" name="', key, '" value="', paramValue, '"/>');
+        }
+    }
+
+    form.push('</form>');
+    jQuery(form.join('')).appendTo('body')[0].submit();
+}
+
+
 var urlIsAuthenticated = "/api/isauthenticated";
 var urlFillBoards = "/api/getboards";
 var urlFillLists = "/api/getlists";
 var urlFillUsers = "/api/getusersonboard";
 var urlReportPreview = "/api/reportpreview";
+var urlReportWord = "/export/word";
 
 
 function IsAuthenticatedSucces(result) {
@@ -227,7 +274,7 @@ function FillListsSucces(result) {
     FillListsClean();
     $.each(result, function () {
         lists.push(new List(this.Id, this.Name, this.Pos));
-     });
+    });
     BindLists();
 }
 
@@ -365,4 +412,13 @@ function ReportPreview() {
     request.fail(function (jqXHR, textStatus) {
         logError(textStatus);
     });
+}
+
+function ReportWord() {
+    var data = collectReportParameter();
+    submitValues(urlReportWord, data);
+
+    /*$.post(urlReportWord, data, function (retData) {
+    $("body").append("<iframe src='" + retData.url + "' style='display: none;' ></iframe>")
+    });*/
 }
