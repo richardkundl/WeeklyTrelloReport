@@ -25,6 +25,11 @@ Date.prototype.currentDate = function () {
     return (year + "-" + month + "-" + day);
 };
 
+function createAutoClosingAlert(selector, delay) {
+    var alert = $(selector).alert();
+    window.setTimeout(function () { alert.alert('close') }, delay);
+}
+
 var boards;
 
 function Board(id, name) {
@@ -47,6 +52,8 @@ function toTwoDigitNumber(number) {
 
     return '0' + number;
 }
+
+
 
 function startDateOfWeek(weekNo) {
     var d1 = new Date();
@@ -71,6 +78,8 @@ function endDateOfWeek(weekNo) {
     return rangeIsTo;
 };
 
+
+
 var isConsoleLogging = true;
 function logError(error) {
     if (isConsoleLogging == true) {
@@ -80,6 +89,8 @@ function logError(error) {
         alert(error);
     }
 }
+
+
 
 function weekNumberSetDefault() {
     var week = $("#report-week").val();
@@ -246,6 +257,7 @@ function FillUsersSucces(result) {
 }
 
 function ReportPreviewSucces(result) {
+    createAutoClosingAlert("#report-preview-alert", 2000);
     var cards = result;
     var source = document.getElementById("Handlebars-Template").textContent;
     var template = Handlebars.compile(source);

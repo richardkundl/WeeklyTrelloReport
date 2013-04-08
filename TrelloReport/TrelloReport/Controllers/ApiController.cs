@@ -246,6 +246,48 @@ namespace TrelloReport.Controllers
         }
 
         /// <summary>
+        /// Get cards for a report
+        /// </summary>
+        /// <param name="model">Input model</param>
+        /// <param name="instance">Trello instance</param>
+        /// <returns>Card list</returns>
+        private static IEnumerable<Card> GetCards(ReportModel model, ITrello instance)
+        {
+            // set query start date 
+            var startDate = GetStartDate(model.StartDate, model.ReportIntervalType);
+
+            // set query end date
+            var endDate = GetEndDate(startDate, model.ReportIntervalType);
+
+            // query cards
+            var cards = instance.Cards.ForBoard(new BoardId(model.BoardId));
+
+            // if interval type is actually, doesn't need activity filter
+            if (model.ReportIntervalType != "actually")
+            {
+                // query card actions
+                var changedCards = GetCardIdsFromActions(instance, model.BoardId, startDate, endDate);
+
+                // filter cards by date interval
+                cards = cards.Where(c => changedCards.Contains(c.Id));
+            }
+
+            // filter cards by lists
+            cards = cards.Where(c => model.ListIds.Contains(c.IdList));
+
+            // filter cards by user
+            cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
+
+            // separated cards by labels
+            cards = SepareteCardByLabels(cards);
+
+            // order cards 
+            cards = OrderCards(cards);
+
+            return cards;
+        }
+
+        /// <summary>
         /// User is Trello authenticated
         /// </summary>
         /// <returns>Bool and auth url</returns>
@@ -276,6 +318,7 @@ namespace TrelloReport.Controllers
             {
                 retBoards.Add(new { board.Id, board.Name, board.Closed, board.IdOrganization, board.Desc });
             }
+
             return CreateResponse(retBoards);
         }
 
@@ -325,37 +368,7 @@ namespace TrelloReport.Controllers
                 return CreateResponse(null);
             }
 
-            // set query start date 
-            var startDate = GetStartDate(model.StartDate, model.ReportIntervalType);
-
-            // set query end date
-            var endDate = GetEndDate(startDate, model.ReportIntervalType);
-
-            // query cards
-            var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
-
-            // if interval type is actually, doesn't need activity filter
-            if (model.ReportIntervalType != "actually")
-            {
-                // query card actions
-                var changedCards = GetCardIdsFromActions(TrelloInstance, model.BoardId, startDate, endDate);
-
-                // filter cards by date interval
-                cards = cards.Where(c => changedCards.Contains(c.Id));
-            }
-
-            // filter cards by lists
-            cards = cards.Where(c => model.ListIds.Contains(c.IdList));
-
-            // filter cards by user
-            cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
-
-            // separated cards by labels
-            cards = SepareteCardByLabels(cards);
-
-            // order cards 
-            cards = OrderCards(cards);
-
+            var cards = GetCards(model, TrelloInstance);
             return CreateResponse(cards);
         }
     }
