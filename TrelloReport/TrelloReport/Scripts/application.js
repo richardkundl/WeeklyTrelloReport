@@ -77,7 +77,8 @@ function weekNumberSetDefault() {
     var week = $("#report-week").val();
 
     if (week == '') {
-        week = (new Date()).getWeek();
+        // previous week
+        week = (new Date()).getWeek() - 1;
         $("#report-week").val(week);
     }
 

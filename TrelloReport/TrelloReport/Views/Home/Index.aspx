@@ -76,11 +76,13 @@
         </div>
     </div>
     <div class="row">
-        <h6>Előnézet:</h6>
+        <h6>
+            Előnézet:</h6>
         <script id="Handlebars-Template" type="text/x-handlebars-template">
 			  {{#each Cards}}
 			  	<div class="well well-small">
                     <p>
+                     <span class="label label-info">{{ListName IdList}}</span>
                     {{#if Labels}}
                         {{#each Labels}}
                         <span class="label">{{Name}}</span>
@@ -89,7 +91,7 @@
                         <span class="label">Egyéb</span>
                     {{/if}}
                     </p>
-				  	<p><a href="{{Url}}" title="{{Name}}">{{ListName IdList}}-{{Name}}</a></p>
+				  	<p><a href="{{Url}}" title="{{Name}}">{{Name}}</a></p>
                     <ul>
                         {{#each Members}}
                         <li>{{FullName}}</li>
