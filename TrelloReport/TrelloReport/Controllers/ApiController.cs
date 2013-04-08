@@ -53,9 +53,82 @@ namespace TrelloReport.Controllers
             {
                 return (action as AddMemberToCardAction).Data.Card.GetCardId();
             }
+            if (action is CreateCardAction)
+            {
+                return (action as CreateCardAction).Data.Card.GetCardId();
+            }
+            if (action is AddAttachmentToCardAction)
+            {
+                return (action as AddAttachmentToCardAction).Data.Card.GetCardId();
+            }
+            if (action is AddChecklistToCardAction)
+            {
+                return (action as AddChecklistToCardAction).Data.Card.GetCardId();
+            }
+            if (action is CommentCardAction)
+            {
+                return (action as CommentCardAction).Data.Card.GetCardId();
+            }
+            if (action is ConvertToCardFromCheckItemAction)
+            {
+                return (action as ConvertToCardFromCheckItemAction).Data.Card.GetCardId();
+            }
+            if (action is MoveCardFromBoardAction)
+            {
+                return (action as MoveCardFromBoardAction).Data.Card.GetCardId();
+            }
+            if (action is MoveCardToBoardAction)
+            {
+                return (action as MoveCardToBoardAction).Data.Card.GetCardId();
+            }
+            if (action is RemoveChecklistFromCardAction)
+            {
+                return (action as RemoveChecklistFromCardAction).Data.Card.GetCardId();
+            }
+            if (action is RemoveMemberFromCardAction)
+            {
+                return (action as RemoveMemberFromCardAction).Data.Card.GetCardId();
+            }
+            if (action is UpdateCardAction)
+            {
+                return (action as UpdateCardAction).Data.Card.GetCardId();
+            }
+            if (action is UpdateCheckItemStateOnCardAction)
+            {
+                return (action as UpdateCheckItemStateOnCardAction).Data.Card.GetCardId();
+            }
 
             return string.Empty;
         }
+
+        private static List<string> GetCardIdsFromActions(ITrello trello, string boardId, DateTime startDate, DateTime endDate)
+        {
+            var actions = trello.Actions.ForBoard(
+                            new BoardId(boardId),
+                            since: Since.Date(startDate),
+                            paging: new Paging(1000, 0),
+                            filter: CardActionTypes);
+            var changedCardActions = actions.Where(a => a.Date > startDate && a.Date < endDate).ToList();
+            var changedCardIds = new List<string>();
+            foreach (var changedCardAction in changedCardActions)
+            {
+                // get only cards
+                var cardId = GetCardIdFromAction(changedCardAction);
+
+                // modified card
+                if (!string.IsNullOrEmpty(cardId))
+                {
+                    // card id isnt exist
+                    if (!changedCardIds.Contains(cardId))
+                    {
+                        changedCardIds.Add(cardId);
+                    }
+                }
+            }
+
+            return changedCardIds;
+        }
+
 
         public ActionResult IsAuthenticated()
         {
@@ -141,24 +214,17 @@ namespace TrelloReport.Controllers
             // query cards
             var cards = TrelloInstance.Cards.ForBoard(new BoardId(model.BoardId));
 
+            // query card actions
+            var changedCards = GetCardIdsFromActions(TrelloInstance, model.BoardId, startDate, endDate);
+
             // filter cards by lists
             cards = cards.Where(c => model.ListIds.Contains(c.IdList));
 
             // filter cards by user
             cards = cards.Where(c => c.Members.Select(m => m.Id).Intersect(model.UserIds).Any());
 
-            // filter cards by date intervall
-            var actions = TrelloInstance.Actions.ForBoard(
-                            new BoardId(model.BoardId),
-                            since: Since.Date(startDate),
-                            paging: new Paging(1000, 0),
-                            filter: CardActionTypes);
-            var changedCardActions = actions.Where(a => a.Date > startDate && a.Date < endDate).ToList();
-            var changedCardIds = new List<string>();
-            foreach (var changedCardAction in changedCardActions)
-            {
-                changedCardIds.Add(GetCardIdFromAction(changedCardAction));
-            }
+            // filter cards by date interval
+            cards = cards.Where(c => changedCards.Contains(c.Id));
 
             // separated cards by labels
             var separeted = new List<Card>();
