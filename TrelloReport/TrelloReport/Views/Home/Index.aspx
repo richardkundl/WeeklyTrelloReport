@@ -3,6 +3,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
     Trello Weekly Report
 </asp:Content>
+
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <h1>
         <%= Model.Message %></h1>
@@ -105,13 +106,12 @@
         </div>
     </div>
 </asp:Content>
+
 <asp:Content ID="Content3" ContentPlaceHolderID="JsContent" runat="server">
     <script type="text/javascript">
         $(document).ready(function () {
             IsAuthenticated();
-
             weekNumberSetDefault();
-
             reportTypeActuallySelect();
         });
 
@@ -160,6 +160,5 @@
                 $(this).prop('checked', checkedStatus);
             });
         });
-
     </script>
 </asp:Content>
