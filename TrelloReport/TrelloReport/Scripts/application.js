@@ -235,7 +235,7 @@ var urlFillLists = "/api/getlists";
 var urlFillUsers = "/api/getusersonboard";
 var urlReportPreview = "/api/reportpreview";
 var urlReportWord = "/export/word";
-
+var urlReportExcel = "/export/excel";
 
 function IsAuthenticatedSucces(result) {
     if (result.isLogged == true) {
@@ -417,8 +417,9 @@ function ReportPreview() {
 function ReportWord() {
     var data = collectReportParameter();
     submitValues(urlReportWord, data);
+}
 
-    /*$.post(urlReportWord, data, function (retData) {
-    $("body").append("<iframe src='" + retData.url + "' style='display: none;' ></iframe>")
-    });*/
+function ReportExcel() {
+    var data = collectReportParameter();
+    submitValues(urlReportExcel, data);
 }
