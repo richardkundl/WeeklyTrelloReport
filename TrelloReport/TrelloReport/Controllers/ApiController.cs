@@ -31,8 +31,6 @@ namespace TrelloReport.Controllers
             return result;
         }
 
-
-
         /// <summary>
         /// User is Trello authenticated
         /// </summary>
