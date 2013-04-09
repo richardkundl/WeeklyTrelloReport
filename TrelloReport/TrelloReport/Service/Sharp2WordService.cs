@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using TrelloNet;
+using TrelloReport.Helper;
 using TrelloReport.Service.Interface;
 using Word.Api.Interfaces;
 using Word.Utils;
@@ -14,22 +14,9 @@ namespace TrelloReport.Service
 {
     public static class Sharp2WordServiceHelper
     {
-        public static Properties GetProperties()
+        public static IDocument AddHeader(this IDocument builder, int weekNumber, string dateInterval)
         {
-            return new Properties
-                       {
-                           Company = "Hvg Online Zrt.",
-                           Created = DateTime.Now,
-                           Description = "Heti trello riport",
-                           Keywords = "Trello, Workflow",
-                           Title = "Heti trello riport",
-                           Author = "\"Weekly Trello Report\" Application"
-                       };
-        }
-
-        public static IDocument AddHeader(this IDocument builder, int weekNumber)
-        {
-            builder.Header.AddEle(Paragraph.With("X. etap - 2012.03.18 - 29 - várható fejlesztések").Create());
+            builder.Header.AddEle(Paragraph.With(String.Format("{0}. etap - {1} - várható fejlesztések", Math.Floor(Convert.ToDouble(weekNumber / 3)), dateInterval)).Create());
             return builder;
         }
 
@@ -43,7 +30,7 @@ namespace TrelloReport.Service
         {
             foreach (var card in cards)
             {
-                builder.AddEle(Paragraph.With(card.Name).Create());
+                builder.AddEle(Link.With(string.Format("\t- {0}", card.Name), card.Url).Create());
             }
 
             return builder;
@@ -90,7 +77,7 @@ namespace TrelloReport.Service
         {
             using (var memoryStream = new MemoryStream())
             {
-                using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+                using (var streamWriter = new StreamWriter(memoryStream, System.Text.Encoding.UTF8))
                 {
                     streamWriter.Write(Util.Pretty(document.Content));
                 }
@@ -103,9 +90,11 @@ namespace TrelloReport.Service
     {
         public byte[] GenerateCardReports(List<Card> cards, List<List> lists)
         {
+            var weekNumber = DateTimeHelper.GetWeekNumber(DateTime.Now);
+            const string interval = "201#.##.## - 201#.##.##";
+
             IDocument myDoc = new Document2004();
-            myDoc.Head.Properties = Sharp2WordServiceHelper.GetProperties();
-            myDoc = myDoc.AddHeader(12).AddHeadline(12).AddReports(cards, lists);
+            myDoc = myDoc.AddHeader(weekNumber, interval).AddHeadline(weekNumber).AddReports(cards, lists);
             return myDoc.CreateResponse();
         }
     }

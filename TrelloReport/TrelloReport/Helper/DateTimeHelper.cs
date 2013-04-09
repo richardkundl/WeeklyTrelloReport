@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace TrelloReport.Helper
 {
@@ -51,6 +52,21 @@ namespace TrelloReport.Helper
             }
 
             return startDate;
+        }
+
+        /// <summary>
+        /// Get date weeknumber
+        /// </summary>
+        /// <param name="date">date</param>
+        /// <returns>week number</returns>
+        public static int GetWeekNumber(DateTime date)
+        {
+            CultureInfo ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            return ci.Calendar.GetWeekOfYear(
+                date.Date,
+                ci.DateTimeFormat.CalendarWeekRule,
+                ci.DateTimeFormat.FirstDayOfWeek
+            );
         }
     }
 }
