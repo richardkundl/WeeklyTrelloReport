@@ -90,6 +90,9 @@
     <Reference Include="TrelloNet">
       <HintPath>..\lib\TrelloNet.dll</HintPath>
     </Reference>
+    <Reference Include="Word">
+      <HintPath>..\lib\Word.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ApiController.cs" />
@@ -102,11 +105,14 @@
     <Compile Include="Helper\CardComparer.cs" />
     <Compile Include="Helper\CardHelper.cs" />
     <Compile Include="Helper\DateTimeHelper.cs" />
-    <Compile Include="Helper\ExcelHelper.cs" />
-    <Compile Include="Helper\WordHelper.cs" />
+    <Compile Include="Service\ExcelHelper.cs" />
+    <Compile Include="Service\FoxbyWordService.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\ReportModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\Interface\IExcelService.cs" />
+    <Compile Include="Service\Interface\IWordService.cs" />
+    <Compile Include="Service\Sharp2WordService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-responsive.css" />
