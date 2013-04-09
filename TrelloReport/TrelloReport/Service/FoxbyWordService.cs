@@ -5,19 +5,18 @@ using Foxby.Core;
 using Foxby.Core.DocumentBuilder;
 using Foxby.Core.MetaObjects;
 using TrelloNet;
+using TrelloReport.Service.Interface;
 
 namespace TrelloReport.Helper
 {
-    /// <summary>
-    /// </summary>
-    public static class WordHelper
+    public static class FoxbyWordServiceHelper
     {
-        private static IDocumentTagContextBuilder AddHeadline(this IDocumentTagContextBuilder builder, int weekNumber)
+        public static IDocumentTagContextBuilder AddHeadline(this IDocumentTagContextBuilder builder, int weekNumber)
         {
             return builder.Paragraph(z => z.Bold.Text(String.Format("{0}. hét utáni státuszriport:", weekNumber))).EmptyLine();
         }
 
-        private static IDocumentTagContextBuilder AddCards(this IDocumentTagContextBuilder builder, List<Card> cards)
+        public static IDocumentTagContextBuilder AddCards(this IDocumentTagContextBuilder builder, List<Card> cards)
         {
             foreach (var card in cards)
             {
@@ -27,7 +26,7 @@ namespace TrelloReport.Helper
             return builder;
         }
 
-        private static IDocumentTagContextBuilder AddLists(this IDocumentTagContextBuilder builder, List<Card> cards, List<List> lists)
+        public static IDocumentTagContextBuilder AddLists(this IDocumentTagContextBuilder builder, List<Card> cards, List<List> lists)
         {
             var groupped = cards.GroupBy(c => c.IdList);
 
@@ -42,7 +41,7 @@ namespace TrelloReport.Helper
             return builder;
         }
 
-        private static IDocumentTagContextBuilder AddReports(this IDocumentTagContextBuilder builder, List<Card> cards, List<List> lists)
+        public static IDocumentTagContextBuilder AddReports(this IDocumentTagContextBuilder builder, List<Card> cards, List<List> lists)
         {
             var comparer = new CardComparer();
             var groupped = cards.GroupBy(c => c.Labels, comparer);
@@ -57,7 +56,7 @@ namespace TrelloReport.Helper
                     name = key.Name;
                 }
 
-                builder.Paragraph(z => z.Bold.Text(String.Format("{0}:",name)))
+                builder.Paragraph(z => z.Bold.Text(String.Format("{0}:", name)))
                     .AddLists(group.ToList(), lists)
                     .EmptyLine();
 
@@ -65,8 +64,13 @@ namespace TrelloReport.Helper
 
             return builder;
         }
+    }
 
-        public static byte[] HelloWord(List<Card> cards, List<List> lists)
+    /// <summary>
+    /// </summary>
+    public class FoxbyWordService : IWordService
+    {
+        public byte[] GenerateCardReports(List<Card> cards, List<List> lists)
         {
             using (var docxDocument = new DocxDocument(SimpleTemplate.EmptyWordFile))
             {
@@ -75,7 +79,7 @@ namespace TrelloReport.Helper
                             x => x.Paragraph(z => z.Bold.Text("X. etap - 2012.03.18 - 29 - várható fejlesztések")));
 
                 builder.Tag(SimpleTemplate.ContentTagName,
-                            x => AddHeadline(x, 12).AddReports(cards, lists));
+                            x => FoxbyWordServiceHelper.AddHeadline(x, 12).AddReports(cards, lists));
 
                 return docxDocument.ToArray();
             }

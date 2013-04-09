@@ -12,7 +12,7 @@ namespace TrelloReport.Controllers
         {
             var cards = CardHelper.GetCards(model, TrelloInstance).ToList();
             var lists = TrelloInstance.Lists.ForBoard(new BoardId(model.BoardId)).OrderBy(l => l.Pos).ToList();
-            var result = WordHelper.HelloWord(cards, lists);
+            var result = new FoxbyWordService().GenerateCardReports(cards, lists);
             return File(result,
                 "application/vnd.ms-word",
                 "mytestfile.doc");
