@@ -23,10 +23,14 @@ namespace TrelloReport.Controllers
 
         public ActionResult Excel(ReportModel model)
         {
-            var result = "";
-            return File(new System.Text.UTF8Encoding().GetBytes(result),
+            var cards = CardHelper.GetCards(model, TrelloInstance).ToList();
+            var lists = TrelloInstance.Lists.ForBoard(new BoardId(model.BoardId)).OrderBy(l => l.Pos).ToList();
+            var result = new NpoiExcelService().GenerateCardReports(cards, lists, model.UserIds);
+            var fileName = string.Format("trello-report-{0}.xls", DateTime.Now.ToString("yyyy-MM-dd")); 
+            
+            return File(result,
                 "application/vnd.ms-excel",
-                "mytestfile.xls");
+                fileName);
         }
     }
 }

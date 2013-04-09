@@ -19,7 +19,8 @@ namespace TrelloReport.Service.Interface
         /// </summary>
         /// <param name="cards"></param>
         /// <param name="lists"></param>
+        /// <param name="users"></param>
         /// <returns></returns>
-        byte[] GenerateCardReports(List<Card> cards, List<List> lists);
+        byte[] GenerateCardReports(List<Card> cards, List<List> lists, List<string> users);
     }
 }
