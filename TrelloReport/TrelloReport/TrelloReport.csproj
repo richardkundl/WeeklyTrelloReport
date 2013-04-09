@@ -105,6 +105,7 @@
     <Compile Include="Helper\CardComparer.cs" />
     <Compile Include="Helper\CardHelper.cs" />
     <Compile Include="Helper\DateTimeHelper.cs" />
+    <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="Service\ExcelHelper.cs" />
     <Compile Include="Service\FoxbyWordService.cs" />
     <Compile Include="Models\HomeModel.cs" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Reports\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

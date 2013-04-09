@@ -7,7 +7,7 @@ using Foxby.Core.MetaObjects;
 using TrelloNet;
 using TrelloReport.Service.Interface;
 
-namespace TrelloReport.Helper
+namespace TrelloReport.Service
 {
     public static class FoxbyWordServiceHelper
     {

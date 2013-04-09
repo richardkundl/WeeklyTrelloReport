@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using TrelloNet;
 using TrelloReport.Service.Interface;
 
-namespace TrelloReport.Helper
+namespace TrelloReport.Service
 {
     public class NpoiExcelService : IExcelService
     {

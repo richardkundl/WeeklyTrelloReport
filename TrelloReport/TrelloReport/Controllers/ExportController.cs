@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using TrelloNet;
 using TrelloReport.Models;
 using TrelloReport.Helper;
+using TrelloReport.Service;
 
 namespace TrelloReport.Controllers
 {
@@ -12,7 +13,7 @@ namespace TrelloReport.Controllers
         {
             var cards = CardHelper.GetCards(model, TrelloInstance).ToList();
             var lists = TrelloInstance.Lists.ForBoard(new BoardId(model.BoardId)).OrderBy(l => l.Pos).ToList();
-            var result = new FoxbyWordService().GenerateCardReports(cards, lists);
+            var result = new Sharp2WordService().GenerateCardReports(cards, lists);
             return File(result,
                 "application/vnd.ms-word",
                 "mytestfile.doc");
