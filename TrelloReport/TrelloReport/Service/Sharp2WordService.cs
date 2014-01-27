@@ -30,7 +30,7 @@ namespace TrelloReport.Service
         {
             foreach (var card in cards)
             {
-                builder.AddEle(Link.With(string.Format("\t- {0}", card.Name), card.Url).Create());
+				builder.AddEle(Link.With(string.Format("\t- {0}", card.Name.Replace("&", "&amp;")), card.Url).Create());
             }
 
             return builder;
@@ -42,7 +42,7 @@ namespace TrelloReport.Service
 
             foreach (var group in groupped)
             {
-                var name = lists.FirstOrDefault(l => l.Id == @group.Key).Name;
+				var name = lists.FirstOrDefault(l => l.Id == @group.Key).Name;
                 builder.AddEle(Heading3.With(string.Format("{0}:", name)).WithStyle().SetBold(false).Create());
                 builder.AddCards(group.ToList());
             }
