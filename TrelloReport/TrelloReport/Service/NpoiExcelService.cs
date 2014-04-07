@@ -119,7 +119,7 @@ namespace TrelloReport.Service
         }
     }
 
-    public class NpoiExcelService : IExcelService
+	public class NpoiExcelService : IReportService
     {
         public byte[] GenerateCardReports(List<Card> cards, List<List> lists, List<string> users)
         {

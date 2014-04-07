@@ -12,7 +12,7 @@ namespace TrelloReport.Service.Interface
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public interface IExcelService
+    public interface IReportService
     {
         /// <summary>
         /// Generate Card reports

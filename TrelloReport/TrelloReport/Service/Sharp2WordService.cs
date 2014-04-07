@@ -86,9 +86,9 @@ namespace TrelloReport.Service
         }
     }
 
-    public class Sharp2WordService : IWordService
+	public class Sharp2WordService : IReportService
     {
-        public byte[] GenerateCardReports(List<Card> cards, List<List> lists)
+		public byte[] GenerateCardReports(List<Card> cards, List<List> lists, List<string> users)
         {
             var weekNumber = DateTimeHelper.GetWeekNumber(DateTime.Now);
             const string interval = "201#.##.## - 201#.##.##";
