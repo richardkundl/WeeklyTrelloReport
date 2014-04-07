@@ -98,6 +98,26 @@
                         <li>{{FullName}}</li>
                         {{/each}}
                     </ul>
+					{{#if Checklists}}
+					<ul>
+						<label>Subtasks</label>
+						{{#each Checklists}}
+						<li>
+							<ul>
+								<label>{{Name}}</label>
+								{{#each CheckItems}}
+									<li>
+									{{ Checked Checked}}
+									{{Name}}
+									</li>
+								{{/each}}
+							 </ul>
+						</li>
+							
+						{{/each}}
+					</ul>
+					{{else}}
+					{{/if}}
 			  	</div>
 			  {{/each}}
         </script>
