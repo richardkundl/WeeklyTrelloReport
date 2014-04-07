@@ -22,6 +22,10 @@
     </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -177,6 +181,7 @@
   <ItemGroup>
     <None Include="App_Readme\Handlebarsjs_LICENSE" />
     <None Include="App_Readme\Handlebarsjs_README.md" />
+    <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <None Include="Scripts\jquery-1.9.1.min.map" />
   </ItemGroup>
   <PropertyGroup>
