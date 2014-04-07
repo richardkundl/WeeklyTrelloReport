@@ -44,7 +44,7 @@ Handlebars.registerHelper('Checked', function (checked) {
 		return '✓';
 	}
 
-	return '';
+	return '□';
 });
 
 Date.prototype.getWeek = function () {

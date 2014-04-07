@@ -43,7 +43,7 @@ namespace TrelloReport.Service
             return builder;
         }
 
-        public static ISheet AddCard(this ISheet builder, string label, int rowNumber, Card card, Member user)
+        public static ISheet AddCard(this ISheet builder, string label, Card card, Member user)
         {
             var userName = "";
             if (user != null)
@@ -51,7 +51,7 @@ namespace TrelloReport.Service
                 userName = user.FullName;
             }
 
-            var row = builder.CreateRow(rowNumber);
+			var row = builder.CreateRow(builder.LastRowNum + 1);
             
             row.CreateCell(0).SetCellValue("");
             
@@ -67,14 +67,53 @@ namespace TrelloReport.Service
             
             row.CreateCell(5).SetCellValue("");
 
-            return builder;
+			return builder;
         }
 
-        public static ISheet AddReports(this ISheet builder, List<Card> cards, List<List> lists, List<string> users)
+		public static ISheet AddSubtasks(this ISheet builder, Card card)
+		{
+			foreach (var checklist in card.Checklists)
+			{
+				var row = builder.CreateRow(builder.LastRowNum + 1);
+
+				row.CreateCell(0).SetCellValue(string.Empty);
+				row.CreateCell(1).SetCellValue(string.Empty);
+				row.CreateCell(2).SetCellValue(string.Empty);
+				row.CreateCell(3).SetCellValue(checklist.Name);
+				var font = builder.Workbook.CreateFont();
+				font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
+				row.GetCell(3).CellStyle = builder.Workbook.CreateCellStyle();
+				row.GetCell(3).CellStyle.SetFont(font);
+
+				row.CreateCell(4).SetCellValue(string.Empty);
+				row.CreateCell(5).SetCellValue(string.Empty);
+				
+				foreach (var items in checklist.CheckItems)
+				{
+					var subrow = builder.CreateRow(builder.LastRowNum + 1);
+					var name = "□ " + items.Name;
+					if (items.Checked)
+					{
+						name = "✓ " + items.Name;
+					}
+
+					subrow.CreateCell(0).SetCellValue(string.Empty);
+					subrow.CreateCell(1).SetCellValue(string.Empty);
+					subrow.CreateCell(2).SetCellValue(string.Empty);
+					subrow.CreateCell(3).SetCellValue(name);
+					subrow.CreateCell(4).SetCellValue(string.Empty);
+					subrow.CreateCell(5).SetCellValue(string.Empty);
+				}
+			}
+
+			return builder;
+		}
+
+	    public static ISheet AddReports(this ISheet builder, List<Card> cards, List<List> lists, List<string> users)
         {
             var comparer = new CardComparer();
             var groupped = cards.GroupBy(c => c.Labels, comparer);
-            var rowNumber = 1;
+            //var rowNumber = 1;
 
             foreach (var group in groupped)
             {
@@ -94,14 +133,16 @@ namespace TrelloReport.Service
                     {
                         foreach (var member in actual.Members)
                         {
-                            builder.AddCard(name, rowNumber, actual, member);
-                            rowNumber = rowNumber + 1;
+                            builder.AddCard(name, actual, member);
+	                        builder.AddSubtasks(actual);
+							//rowNumber = rowNumber + 1;
                         }
                     }
                     else
                     {
-                        builder.AddCard(name, rowNumber, actual, actual.Members.FirstOrDefault());
-                        rowNumber = rowNumber + 1;
+                        builder.AddCard(name, actual, actual.Members.FirstOrDefault());
+						builder.AddSubtasks(actual);
+                        //rowNumber = rowNumber + 1;
                     }
                 }
             }
